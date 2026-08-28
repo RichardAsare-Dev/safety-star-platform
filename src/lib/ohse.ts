@@ -79,7 +79,7 @@ export function tierDisabledReason(tier: LeadershipTier | null, categoryTier: Le
 export function hodPoints(n: Partial<Nomination>) {
   const values = HOD_METRICS.map((m) => n[m.key] ?? null);
   if (values.some((v) => v === null)) return null;
-  return values.reduce((sum, v) => sum + (v as number), 0);
+  return values.reduce<number>((sum, v) => sum + (v as number), 0);
 }
 
 export function totalScore(n: Nomination) {
@@ -119,7 +119,7 @@ export function initials(name: string) {
 
 export function toCsv(rows: Record<string, unknown>[]) {
   if (rows.length === 0) return "";
-  const headers = Object.keys(rows[0]);
+  const headers = Object.keys(rows[0] as Record<string, unknown>);
   const escape = (value: unknown) => {
     const text = value === null || value === undefined ? "" : String(value);
     return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
