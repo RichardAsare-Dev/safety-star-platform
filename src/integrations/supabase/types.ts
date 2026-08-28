@@ -14,7 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      departments: {
+        Row: {
+          batch_category: Database["public"]["Enums"]["batch_category"]
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          batch_category: Database["public"]["Enums"]["batch_category"]
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          batch_category?: Database["public"]["Enums"]["batch_category"]
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      nominations: {
+        Row: {
+          action_type: Database["public"]["Enums"]["nomination_action"]
+          award_categories: string[]
+          capa_closure_rate: number | null
+          citation_note: string | null
+          created_at: string
+          disqualification_reason: string | null
+          hod_duty_of_care: number | null
+          hod_hazard_awareness: number | null
+          hod_participation: number | null
+          hod_safe_work_behavior: number | null
+          hod_speaking_up: number | null
+          hse_score: number | null
+          id: string
+          nominee_department_id: string | null
+          nominee_id: string | null
+          nominee_position_title: string | null
+          recordable_injury: boolean
+          status: Database["public"]["Enums"]["nomination_status"]
+          voter_department_id: string | null
+          voter_name: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["nomination_action"]
+          award_categories?: string[]
+          capa_closure_rate?: number | null
+          citation_note?: string | null
+          created_at?: string
+          disqualification_reason?: string | null
+          hod_duty_of_care?: number | null
+          hod_hazard_awareness?: number | null
+          hod_participation?: number | null
+          hod_safe_work_behavior?: number | null
+          hod_speaking_up?: number | null
+          hse_score?: number | null
+          id?: string
+          nominee_department_id?: string | null
+          nominee_id?: string | null
+          nominee_position_title?: string | null
+          recordable_injury?: boolean
+          status?: Database["public"]["Enums"]["nomination_status"]
+          voter_department_id?: string | null
+          voter_name: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["nomination_action"]
+          award_categories?: string[]
+          capa_closure_rate?: number | null
+          citation_note?: string | null
+          created_at?: string
+          disqualification_reason?: string | null
+          hod_duty_of_care?: number | null
+          hod_hazard_awareness?: number | null
+          hod_participation?: number | null
+          hod_safe_work_behavior?: number | null
+          hod_speaking_up?: number | null
+          hse_score?: number | null
+          id?: string
+          nominee_department_id?: string | null
+          nominee_id?: string | null
+          nominee_position_title?: string | null
+          recordable_injury?: boolean
+          status?: Database["public"]["Enums"]["nomination_status"]
+          voter_department_id?: string | null
+          voter_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nominations_nominee_department_id_fkey"
+            columns: ["nominee_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nominations_nominee_id_fkey"
+            columns: ["nominee_id"]
+            isOneToOne: false
+            referencedRelation: "users_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nominations_voter_department_id_fkey"
+            columns: ["voter_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      program_settings: {
+        Row: {
+          created_at: string
+          id: string
+          maturity_stage: string
+          voting_closes_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          maturity_stage?: string
+          voting_closes_at: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          maturity_stage?: string
+          voting_closes_at?: string
+        }
+        Relationships: []
+      }
+      support_requests: {
+        Row: {
+          created_at: string
+          employee_name: string
+          id: string
+          mobile_contact: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          employee_name: string
+          id?: string
+          mobile_contact: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          employee_name?: string
+          id?: string
+          mobile_contact?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
+      users_employees: {
+        Row: {
+          created_at: string
+          department_id: string
+          email: string | null
+          full_name: string
+          id: string
+          leadership_tier: Database["public"]["Enums"]["leadership_tier"]
+          mobile_contact: string | null
+          position_title: string
+        }
+        Insert: {
+          created_at?: string
+          department_id: string
+          email?: string | null
+          full_name: string
+          id?: string
+          leadership_tier?: Database["public"]["Enums"]["leadership_tier"]
+          mobile_contact?: string | null
+          position_title: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          leadership_tier?: Database["public"]["Enums"]["leadership_tier"]
+          mobile_contact?: string | null
+          position_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +220,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      batch_category: "Batch I" | "Batch II"
+      leadership_tier: "Lead" | "Coordinator" | "Non-Leadership"
+      nomination_action: "Check Batch I" | "Check Batch II" | "Request Support"
+      nomination_status:
+        | "Pending HSE Verification"
+        | "Disqualified"
+        | "Approved for HOD Evaluation"
+        | "Completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +354,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      batch_category: ["Batch I", "Batch II"],
+      leadership_tier: ["Lead", "Coordinator", "Non-Leadership"],
+      nomination_action: ["Check Batch I", "Check Batch II", "Request Support"],
+      nomination_status: [
+        "Pending HSE Verification",
+        "Disqualified",
+        "Approved for HOD Evaluation",
+        "Completed",
+      ],
+    },
   },
 } as const
