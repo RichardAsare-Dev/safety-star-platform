@@ -249,7 +249,7 @@ function Dashboard() {
   );
 }
 
-function NomineeRow({ nomination, name }: { nomination: Nomination; name?: string }) {
+function NomineeRow({ nomination, name }: { nomination: Nomination; name?: string | undefined }) {
   return (
     <div className="rounded-md border border-border bg-background/60 p-2.5">
       <div className="flex items-center justify-between gap-2">
