@@ -45,7 +45,7 @@ export const Route = createFileRoute("/nominate")({
       },
     ],
   }),
-  component: NominatePage;
+  component: NominatePage,
 });
 
 const STEPS = ["Voter Info", "Nominee Selection", "Award Categories"];
