@@ -61,6 +61,25 @@ export function useProgramSettings() {
   });
 }
 
+export function useSupportRequests() {
+  return useQuery({
+    queryKey: ["support_requests"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("support_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export async function deleteSupportRequest(id: string) {
+  const { error } = await supabase.from("support_requests").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export function useNominationsRealtime() {
   const queryClient = useQueryClient();
   useEffect(() => {
@@ -70,8 +89,97 @@ export function useNominationsRealtime() {
         queryClient.invalidateQueries({ queryKey: ["nominations"] });
       })
       .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
+}
+
+// ── Admin mutation helpers ────────────────────────────────────────────────────
+
+export async function toggleNomineeStatus(id: string, is_nominee: boolean) {
+  const { error } = await supabase.from("users_employees").update({ is_nominee }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function upsertEmployee(payload: {
+  id?: string;
+  full_name: string;
+  position_title: string;
+  leadership_tier: "Lead" | "Coordinator" | "Non-Leadership";
+  department_id: string;
+  email?: string | null;
+  mobile_contact?: string | null;
+  is_nominee?: boolean;
+}) {
+  if (payload.id) {
+    const { id, ...rest } = payload;
+    const { error } = await supabase.from("users_employees").update(rest).eq("id", id);
+    if (error) throw error;
+  } else {
+    const { id: _id, ...rest } = payload;
+    const { error } = await supabase.from("users_employees").insert(rest);
+    if (error) throw error;
+  }
+}
+
+export async function deleteEmployee(id: string) {
+  const { error } = await supabase.from("users_employees").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteNomination(id: string) {
+  const { error } = await supabase.from("nominations").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function resetNominationStatus(id: string) {
+  const { error } = await supabase
+    .from("nominations")
+    .update({
+      status: "Pending HSE Verification",
+      hse_score: null,
+      capa_closure_rate: null,
+      recordable_injury: false,
+      disqualification_reason: null,
+      hod_duty_of_care: null,
+      hod_safe_work_behavior: null,
+      hod_hazard_awareness: null,
+      hod_speaking_up: null,
+      hod_participation: null,
+      citation_note: null,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateProgramSettings(payload: {
+  id: string;
+  voting_closes_at: string;
+  maturity_stage: string;
+  admin_pin: string;
+  hod_pin: string;
+}) {
+  const { id, ...rest } = payload;
+  const { error } = await supabase.from("program_settings").update(rest).eq("id", id);
+  if (error) throw error;
+}
+
+export async function upsertDepartment(payload: {
+  id?: string;
+  name: string;
+  batch_category: "Batch I" | "Batch II";
+}) {
+  if (payload.id) {
+    const { id, ...rest } = payload;
+    const { error } = await supabase.from("departments").update(rest).eq("id", id);
+    if (error) throw error;
+  } else {
+    const { id: _id, ...rest } = payload;
+    const { error } = await supabase.from("departments").insert(rest);
+    if (error) throw error;
+  }
+}
+
+export async function deleteDepartment(id: string) {
+  const { error } = await supabase.from("departments").delete().eq("id", id);
+  if (error) throw error;
 }

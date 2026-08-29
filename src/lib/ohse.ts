@@ -117,15 +117,54 @@ export function initials(name: string) {
     .join("");
 }
 
-export function toCsv(rows: Record<string, unknown>[]) {
-  if (rows.length === 0) return "";
-  const headers = Object.keys(rows[0] as Record<string, unknown>);
-  const escape = (value: unknown) => {
-    const text = value === null || value === undefined ? "" : String(value);
-    return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-  };
-  return [
-    headers.join(","),
-    ...rows.map((row) => headers.map((h) => escape(row[h])).join(",")),
-  ].join("\n");
+// ── Excel-compatible CSV export ──────────────────────────────────────────────
+// Produces a BOM-prefixed UTF-8 CSV that Excel opens natively with correct
+// column headers, date formatting, and no encoding issues.
+
+export type ExportRow = {
+  "Nominee Name": string;
+  Department: string;
+  "Position / Title": string;
+  "Leadership Tier": string;
+  Batch: string;
+  "Submitted By (Voter)": string;
+  "Award Categories": string;
+  Status: string;
+  "HSE Score (/100)": string | number;
+  "CAPA Closure Rate (%)": string | number;
+  "Recordable Injury": string;
+  "HOD – Duty of Care (/5)": string | number;
+  "HOD – Safe Work Behavior (/5)": string | number;
+  "HOD – Hazard Awareness (/5)": string | number;
+  "HOD – Speaking Up (/5)": string | number;
+  "HOD – Safety Participation (/5)": string | number;
+  "HOD Total (/30)": string | number;
+  "Total Score (70/30)": string | number;
+  "Disqualification Reason": string;
+  "Citation Note": string;
+  "Vote Count": number;
+  "Submitted At": string;
+};
+
+function escapeCell(value: unknown): string {
+  const text = value === null || value === undefined ? "" : String(value);
+  // Wrap in quotes if contains comma, double-quote, newline, or carriage return
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+export function toExcelCsv(rows: ExportRow[]): Blob {
+  if (rows.length === 0) {
+    // Return empty sheet with headers only
+    const headers = Object.keys({} as ExportRow);
+    const BOM = "\uFEFF";
+    return new Blob([BOM + headers.join(",")], { type: "text/csv;charset=utf-8;" });
+  }
+  const headers = Object.keys(rows[0]) as (keyof ExportRow)[];
+  const lines: string[] = [
+    headers.map(escapeCell).join(","),
+    ...rows.map((row) => headers.map((h) => escapeCell(row[h])).join(",")),
+  ];
+  // BOM (\uFEFF) tells Excel this is UTF-8 — prevents garbled characters
+  const BOM = "\uFEFF";
+  return new Blob([BOM + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
 }

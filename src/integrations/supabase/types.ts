@@ -128,19 +128,25 @@ export type Database = {
       }
       program_settings: {
         Row: {
+          admin_pin: string
           created_at: string
+          hod_pin: string
           id: string
           maturity_stage: string
           voting_closes_at: string
         }
         Insert: {
+          admin_pin?: string
           created_at?: string
+          hod_pin?: string
           id?: string
           maturity_stage?: string
           voting_closes_at: string
         }
         Update: {
+          admin_pin?: string
           created_at?: string
+          hod_pin?: string
           id?: string
           maturity_stage?: string
           voting_closes_at?: string
@@ -178,6 +184,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_nominee: boolean
           leadership_tier: Database["public"]["Enums"]["leadership_tier"]
           mobile_contact: string | null
           position_title: string
@@ -188,6 +195,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_nominee?: boolean
           leadership_tier?: Database["public"]["Enums"]["leadership_tier"]
           mobile_contact?: string | null
           position_title: string
@@ -198,6 +206,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_nominee?: boolean
           leadership_tier?: Database["public"]["Enums"]["leadership_tier"]
           mobile_contact?: string | null
           position_title?: string
